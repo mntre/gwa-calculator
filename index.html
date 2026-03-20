@@ -8,60 +8,63 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
-        body, html {
-            margin: 0; padding: 0; height: 100%;
+        /* Force the body to be transparent so video shows through */
+        html, body {
+            margin: 0; padding: 0; 
+            width: 100%; height: 100%;
+            background-color: #001f3f; /* Deep blue fallback */
             font-family: 'JetBrains Mono', monospace;
-            background-color: #001f3f;
             overflow-x: hidden;
         }
 
+        /* Video styling with highest priority depth */
         .video-bg {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1; object-fit: cover;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            object-fit: cover;
+            z-index: -10; /* Far back */
             filter: brightness(0.4) saturate(1.2);
+            pointer-events: none;
             display: none; 
         }
 
+        /* Orientation Logic */
         @media (orientation: portrait) { #bg-portrait { display: block !important; } }
         @media (orientation: landscape) { #bg-landscape { display: block !important; } }
 
         .container {
+            position: relative;
+            z-index: 1; /* Sits above video */
             display: flex; align-items: center; justify-content: center;
-            min-height: 100vh; width: 100%; padding: 10px;
-            box-sizing: border-box; background: transparent !important;
+            min-height: 100vh; width: 100%; padding: 15px;
+            box-sizing: border-box;
+            background: transparent !important;
         }
 
         .calc-card {
-            background: rgba(0, 31, 63, 0.85);
+            background: rgba(0, 31, 63, 0.82); /* Semi-transparent blue */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 2px solid #ff69b4;
             padding: 1.5rem; border-radius: 20px;
             width: 100%; max-width: 350px;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
             text-align: center; color: white;
         }
 
         h1 { 
             font-family: 'Pirata One', system-ui; margin: 0 0 15px 0;
-            color: #ff69b4; 
-            /* This ensures the title shrinks on tiny screens */
-            font-size: clamp(1.4rem, 7vw, 2.2rem); 
+            color: #ff69b4; font-size: clamp(1.4rem, 7vw, 2.2rem); 
             text-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
-            letter-spacing: 1px;
         }
 
-        .label-grid {
+        .label-grid, .row {
             display: grid; grid-template-columns: 1.2fr 1fr 40px;
-            gap: 8px; margin-bottom: 8px; color: #00ffff;
-            font-size: 0.7rem; text-transform: uppercase;
+            gap: 8px; margin-bottom: 8px;
         }
 
-        .row {
-            display: grid; grid-template-columns: 1.2fr 1fr 40px;
-            gap: 8px; margin-bottom: 10px;
-        }
+        .label-grid { color: #00ffff; font-size: 0.7rem; text-transform: uppercase; }
 
         input {
             width: 100%; padding: 10px; border: 1px solid rgba(255, 255, 255, 0.2);
@@ -72,19 +75,8 @@
         button { cursor: pointer; border: none; font-family: 'Pirata One', cursive; transition: 0.2s; }
 
         .btn-add { width: 100%; padding: 12px; background: #ff69b4; color: white; font-size: 1.3rem; border-radius: 12px; }
-        
-        .btn-pdf { 
-            width: 100%; padding: 10px; 
-            background: linear-gradient(90deg, #ff69b4, #0077be); 
-            color: white; font-size: 1.1rem; border-radius: 12px; margin-top: 10px;
-        }
-
-        .btn-clear { 
-            width: 100%; padding: 6px; background: transparent; 
-            color: #ff69b4; border: 1px solid #ff69b4; 
-            border-radius: 10px; margin-top: 10px; font-size: 0.8rem;
-        }
-
+        .btn-pdf { width: 100%; padding: 10px; background: linear-gradient(90deg, #ff69b4, #0077be); color: white; font-size: 1.1rem; border-radius: 12px; margin-top: 10px; }
+        .btn-clear { width: 100%; padding: 6px; background: transparent; color: #ff69b4; border: 1px solid #ff69b4; border-radius: 10px; margin-top: 10px; font-size: 0.8rem; }
         .btn-remove { background: rgba(255, 255, 255, 0.1); color: #ff69b4; border-radius: 8px; font-family: Arial; font-weight: bold; }
 
         .result-section { margin-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px; }
@@ -103,22 +95,12 @@
     <div class="container">
         <div class="calc-card" id="export-area">
             <h1>✦ GWA CALCULATOR ✦</h1>
-            
-            <div class="label-grid">
-                <span>Grade</span>
-                <span>Units</span>
-                <span></span>
-            </div>
-
+            <div class="label-grid"><span>Grade</span><span>Units</span><span></span></div>
             <div id="grades-container"></div>
-
             <button class="btn-add" onclick="addRow()">+ Add Subject</button>
-            <button class="btn-pdf" onclick="downloadAndEmail()">⬇ Download & Email</button>
+            <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
             <button class="btn-clear" onclick="clearAll()">Clear All</button>
-
-            <div class="result-section">
-                <span id="gwa-display">0.00</span>
-            </div>
+            <div class="result-section"><span id="gwa-display">0.00</span></div>
         </div>
     </div>
 
@@ -126,26 +108,17 @@
         const container = document.getElementById('grades-container');
         const display = document.getElementById('gwa-display');
 
-        // Add a new row for input
         function addRow() {
             const row = document.createElement('div');
             row.className = 'row';
-            row.innerHTML = `
-                <input type="number" step="0.01" class="grade-input" placeholder="1.0" oninput="calculateGWA()">
-                <input type="number" step="0.5" class="unit-input" placeholder="3" oninput="calculateGWA()">
-                <button class="btn-remove" onclick="removeRow(this)">✕</button>
-            `;
+            row.innerHTML = `<input type="number" step="0.01" class="grade-input" placeholder="1.0" oninput="calculateGWA()"><input type="number" step="0.5" class="unit-input" placeholder="3" oninput="calculateGWA()"><button class="btn-remove" onclick="removeRow(this)">✕</button>`;
             container.appendChild(row);
         }
 
-        function removeRow(btn) { 
-            btn.parentElement.remove(); 
-            calculateGWA(); 
-        }
+        function removeRow(btn) { btn.parentElement.remove(); calculateGWA(); }
 
         function calculateGWA() {
-            const grades = document.querySelectorAll('.grade-input');
-            const units = document.querySelectorAll('.unit-input');
+            const grades = document.querySelectorAll('.grade-input'), units = document.querySelectorAll('.unit-input');
             let pts = 0, uTotal = 0;
             grades.forEach((gIn, i) => {
                 const g = parseFloat(gIn.value), u = parseFloat(units[i].value);
@@ -154,50 +127,31 @@
             display.innerText = uTotal > 0 ? (pts / uTotal).toFixed(2) : "0.00";
         }
 
-        function clearAll() { 
-            container.innerHTML = ''; 
-            display.innerText = "0.00"; 
-            addRow(); 
-        }
+        function clearAll() { container.innerHTML = ''; display.innerText = "0.00"; addRow(); }
 
-        // Logic for PDF Download + Email Trigger
-        function downloadAndEmail() {
+        function downloadPDF() {
             const element = document.getElementById('export-area');
-            const opt = {
-                margin: 0.2,
-                filename: 'Ocean_GWA_Report.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 3, useCORS: true, backgroundColor: '#001f3f' },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
             const btns = element.querySelectorAll('button');
             btns.forEach(b => b.style.display = 'none');
 
-            html2pdf().set(opt).from(element).save().then(() => {
+            html2pdf().set({
+                margin: 0.2, filename: 'GWA_Report.pdf', image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 3, useCORS: true, backgroundColor: '#001f3f' },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            }).from(element).save().then(() => {
                 btns.forEach(b => b.style.display = 'inline-block');
-
-                // EMAIL TRIGGER
-                const subject = encodeURIComponent("My GWA Calculation Result");
-                const body = encodeURIComponent("Hi!\n\nI calculated my GWA using the Ocean Calculator. I have downloaded the PDF report.\n\n(Reminder: Please attach the 'Ocean_GWA_Report.pdf' from your downloads folder before sending this email!)");
-                
-                // Use a slight delay so the download finishes before the email app opens
-                setTimeout(() => {
-                    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-                }, 1000);
             });
         }
 
-        // Fix video autoplay on mobile
-        document.addEventListener('DOMContentLoaded', () => {
-            const vids = document.querySelectorAll('video');
-            vids.forEach(v => {
-                v.play().catch(() => {
-                    window.addEventListener('touchstart', () => v.play(), {once: true});
-                });
-            });
+        // Critical: Kickstart videos for mobile
+        window.onload = () => {
             addRow();
-        });
+            const startVids = () => {
+                document.querySelectorAll('video').forEach(v => v.play());
+                document.removeEventListener('touchstart', startVids);
+            };
+            document.addEventListener('touchstart', startVids);
+        };
     </script>
 </body>
 </html>
