@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GWA Calculator | Command Center</title>
+    <title>Mitsuha | GWA Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Zen+Old+Mincho:wght@700&display=swap');
         
         body { 
             font-family: 'Space Grotesk', sans-serif; 
-            background-color: #000000; 
+            background-color: #0c0c1d; 
         }
 
         .glass-card {
-            background: rgba(10, 10, 10, 0.8);
+            background: rgba(15, 15, 35, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(220, 38, 38, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.2);
         }
 
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-
-        /* Video Background Logic */
+        /* Video Background Logic from your working file */
         .video-bg {
             position: fixed;
             top: 50%; left: 50%;
@@ -32,9 +30,10 @@
             z-index: -100;
             transform: translateX(-50%) translateY(-50%);
             object-fit: cover;
+            filter: brightness(0.6);
         }
 
-        /* Toggle between Mobile (girl1) and Desktop (girl2) */
+        /* Toggle Logic */
         #mobile-video { display: block; }
         #desktop-video { display: none; }
 
@@ -43,47 +42,49 @@
             #desktop-video { display: block; }
         }
 
-        .name-glow {
-            text-shadow: 0 0 15px rgba(220, 38, 38, 0.6);
+        .comet-glow {
+            text-shadow: 0 0 15px rgba(0, 212, 255, 0.6), 0 0 30px rgba(255, 77, 109, 0.3);
         }
 
         input {
             background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(220, 38, 38, 0.2) !important;
+            border: 1px solid rgba(0, 212, 255, 0.2) !important;
             color: white;
-            transition: all 0.3s ease;
+            text-align: center;
         }
 
         input:focus {
-            border-color: rgba(220, 38, 38, 0.8) !important;
+            border-color: rgba(0, 212, 255, 0.8) !important;
             outline: none;
-            box-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
         }
     </style>
 </head>
 <body class="min-h-screen text-white overflow-x-hidden">
 
     <video autoplay muted loop playsinline id="mobile-video" class="video-bg">
-        <source src="girl1.mp4" type="video/mp4">
+        <source src="mitsuhap.mp4" type="video/mp4">
     </video>
 
     <video autoplay muted loop playsinline id="desktop-video" class="video-bg">
-        <source src="girl2.mp4" type="video/mp4">
+        <source src="mitsuhal.mp4" type="video/mp4">
     </video>
 
-    <div class="fixed inset-0 bg-gradient-to-b from-black/70 via-black/85 to-red-950/40 -z-[90]"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-indigo-950/60 via-slate-900/80 to-orange-900/30 -z-[90]"></div>
 
     <div class="relative z-10 min-h-screen flex items-center justify-center py-12 px-6">
         
         <div class="max-w-md w-full">
             <div class="text-center mb-8">
-                <h1 class="text-4xl font-black uppercase tracking-tighter italic name-glow">GWA CALCULATOR</h1>
-                <p class="text-red-500 font-mono tracking-[0.4em] uppercase text-[10px] mt-2">Academic Command Center</p>
+                <div class="relative inline-block mb-4">
+                    <h1 class="text-5xl font-black italic tracking-tighter comet-glow" style="font-family: 'Zen Old Mincho', serif;">君の名は。</h1>
+                    <div class="absolute -top-4 -right-8 bg-cyan-500 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border-2 border-black shadow-lg">Magic Hour</div>
+                </div>
+                <p class="text-cyan-400 font-mono tracking-[0.4em] uppercase text-[10px] mt-2">GWA Command Center</p>
             </div>
 
-            <div id="export-area" class="glass-card p-8 rounded-[2.5rem] shadow-2xl">
+            <div id="export-area" class="glass-card p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
                 
-                <div class="grid grid-cols-[1fr_1fr_40px] gap-4 mb-4 text-[10px] font-black uppercase tracking-widest text-red-500/80">
+                <div class="grid grid-cols-[1fr_1fr_40px] gap-4 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400/80">
                     <span>Grade</span>
                     <span>Units</span>
                     <span></span>
@@ -93,27 +94,27 @@
                     </div>
 
                 <div class="space-y-3">
-                    <button onclick="addRow()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-tighter italic rounded-xl transition-all transform hover:scale-[1.02] active:scale-95">
+                    <button onclick="addRow()" class="w-full py-3 bg-white/90 hover:bg-white text-indigo-950 font-black uppercase tracking-tighter italic rounded-xl transition-all transform hover:scale-[1.02] active:scale-95">
                         + Add Subject
                     </button>
                     
-                    <button onclick="downloadPDF()" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold uppercase text-xs tracking-widest rounded-xl transition-all">
-                        Export PDF Report
+                    <button onclick="downloadPDF()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-400 hover:to-pink-400 text-white font-bold uppercase text-xs tracking-widest rounded-xl transition-all shadow-lg">
+                        Export Report
                     </button>
 
-                    <button onclick="clearAll()" class="w-full py-2 text-slate-500 hover:text-red-400 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
+                    <button onclick="clearAll()" class="w-full py-2 text-slate-500 hover:text-cyan-400 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
                         Reset System
                     </button>
                 </div>
 
-                <div class="mt-8 pt-6 border-t border-red-600/20 text-center">
-                    <p class="text-[10px] font-mono text-red-500 uppercase tracking-widest mb-1">Current Calculated GWA</p>
-                    <div id="gwa-display" class="text-6xl font-black italic name-glow">0.00</div>
+                <div class="mt-8 pt-6 border-t border-white/10 text-center">
+                    <p class="text-[10px] font-mono text-pink-400 uppercase tracking-widest mb-1">Calculated GWA</p>
+                    <div id="gwa-display" class="text-6xl font-black italic comet-glow" style="font-family: 'Zen Old Mincho', serif;">0.00</div>
                 </div>
             </div>
 
             <div class="mt-8 text-center">
-                <p class="text-slate-500 text-[9px] uppercase tracking-[0.5em]">Terminal Access Verified</p>
+                <p class="text-slate-500 text-[9px] uppercase tracking-[0.5em]">Syncing with Itomori Terminal...</p>
             </div>
         </div>
     </div>
@@ -126,57 +127,50 @@
             const row = document.createElement('div');
             row.className = 'grid grid-cols-[1fr_1fr_40px] gap-4 items-center';
             row.innerHTML = `
-                <input type="number" step="0.01" class="grade-input w-full p-3 rounded-xl text-center font-bold" placeholder="1.00" oninput="calculateGWA()">
-                <input type="number" step="0.5" class="unit-input w-full p-3 rounded-xl text-center font-bold" placeholder="3.0" oninput="calculateGWA()">
-                <button onclick="removeRow(this)" class="text-red-500 hover:text-red-400 font-bold text-xl">✕</button>
+                <input type="number" step="0.01" class="grade-input w-full p-3 rounded-xl font-bold" placeholder="1.00" oninput="calculateGWA()">
+                <input type="number" step="0.5" class="unit-input w-full p-3 rounded-xl font-bold" placeholder="3.0" oninput="calculateGWA()">
+                <button onclick="removeRow(this)" class="text-pink-500 hover:text-pink-400 font-bold text-xl">✕</button>
             `;
             container.appendChild(row);
         }
 
-        function removeRow(btn) {
-            btn.parentElement.remove();
-            calculateGWA();
-        }
+        function removeRow(btn) { btn.parentElement.remove(); calculateGWA(); }
 
         function calculateGWA() {
-            const grades = document.querySelectorAll('.grade-input');
-            const units = document.querySelectorAll('.unit-input');
+            const grades = document.querySelectorAll('.grade-input'), units = document.querySelectorAll('.unit-input');
             let pts = 0, uTotal = 0;
-            
             grades.forEach((gIn, i) => {
                 const g = parseFloat(gIn.value), u = parseFloat(units[i].value);
                 if (!isNaN(g) && !isNaN(u)) { pts += (g * u); uTotal += u; }
             });
-            
             display.innerText = uTotal > 0 ? (pts / uTotal).toFixed(2) : "0.00";
         }
 
-        function clearAll() {
-            container.innerHTML = '';
-            display.innerText = "0.00";
-            addRow();
-        }
+        function clearAll() { container.innerHTML = ''; display.innerText = "0.00"; addRow(); }
 
         function downloadPDF() {
             const element = document.getElementById('export-area');
             const btns = document.querySelectorAll('button');
             btns.forEach(b => b.style.opacity = '0');
 
-            const opt = {
+            html2pdf().set({
                 margin: 0.5,
-                filename: 'GWA_Command_Center.pdf',
+                filename: 'Mitsuha_GWA_Report.pdf',
                 image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 3, useCORS: true, backgroundColor: '#000000' },
+                html2canvas: { scale: 3, useCORS: true, backgroundColor: '#0c0c1d' },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save().then(() => {
+            }).from(element).save().then(() => {
                 btns.forEach(b => b.style.opacity = '1');
             });
         }
 
-        // Initialize first row
-        window.onload = addRow;
+        // Initialize
+        window.onload = () => {
+            addRow();
+            // Fallback play trigger
+            const playVids = () => document.querySelectorAll('video').forEach(v => v.play());
+            document.addEventListener('touchstart', playVids, {once: true});
+        };
     </script>
 </body>
 </html>
