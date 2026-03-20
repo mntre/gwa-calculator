@@ -11,53 +11,58 @@
         body, html {
             margin: 0; padding: 0; height: 100%;
             font-family: 'JetBrains Mono', monospace;
-            overflow-x: hidden; color: #fff;
-            background-color: #001f3f;
+            background-color: #001f3f; /* Fallback color */
+            overflow-x: hidden;
         }
 
+        /* 1. Background Video Fix */
         .video-bg {
-            position: fixed; top: 50%; left: 50%;
-            width: 100vw; height: 100vh;
-            z-index: -1; transform: translate(-50%, -50%);
-            object-fit: cover; filter: brightness(0.5) saturate(1.2);
-            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Pushes it behind everything */
+            object-fit: cover;
+            filter: brightness(0.5) saturate(1.2);
+            display: none; 
         }
 
-        @media (orientation: portrait) { 
-            #bg-portrait { display: block !important; } 
-            #bg-landscape { display: none !important; }
-        }
-        @media (orientation: landscape) { 
-            #bg-landscape { display: block !important; } 
-            #bg-portrait { display: none !important; }
-        }
+        @media (orientation: portrait) { #bg-portrait { display: block !important; } }
+        @media (orientation: landscape) { #bg-landscape { display: block !important; } }
 
+        /* 2. Transparent Container */
         .container {
-            display: flex; align-items: center; justify-content: center;
-            min-height: 100vh; width: 100%; padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 15px;
             box-sizing: border-box;
+            background: transparent !important; /* CRITICAL: Allows video to show through */
         }
 
         .calc-card {
-            background: rgba(0, 31, 63, 0.85);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(0, 31, 63, 0.8); /* Semi-transparent blue */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 2px solid #ff69b4;
-            padding: 1.5rem; /* Reduced padding for mobile */
+            padding: 1.5rem;
             border-radius: 20px;
-            width: 100%; max-width: 380px;
+            width: 100%;
+            max-width: 360px;
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
             text-align: center;
-            position: relative;
+            color: white;
         }
 
-        /* Responsive Title Size */
         h1 { 
-            font-family: 'Pirata One', system-ui; margin: 0 0 20px 0;
-            color: #ff69b4; 
-            font-size: clamp(1.8rem, 8vw, 2.5rem); /* Scales with screen width */
+            font-family: 'Pirata One', system-ui;
+            margin: 0 0 20px 0;
+            color: #ff69b4;
+            font-size: clamp(1.8rem, 8vw, 2.5rem);
             text-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
-            white-space: nowrap; /* Keeps it on one line */
         }
 
         .label-grid {
@@ -74,41 +79,26 @@
         input {
             width: 100%; padding: 10px; border: 1px solid rgba(255, 255, 255, 0.2);
             background: rgba(0, 0, 0, 0.4); color: #fff;
-            border-radius: 10px; text-align: center; font-size: 0.9rem;
-            box-sizing: border-box;
+            border-radius: 10px; text-align: center;
         }
 
         button { cursor: pointer; border: none; font-family: 'Pirata One', cursive; transition: 0.3s; }
 
-        .btn-add {
-            width: 100%; padding: 12px; background: #ff69b4;
-            color: white; font-size: 1.3rem; border-radius: 12px; margin-top: 10px;
-        }
-
-        .btn-pdf {
-            width: 100%; padding: 10px; 
-            background: linear-gradient(90deg, #ff69b4, #0077be);
-            color: white; font-size: 1.1rem; border-radius: 12px; margin-top: 10px;
-        }
-
-        .btn-clear {
-            width: 100%; padding: 8px; background: transparent;
-            color: #ff69b4; border: 1px solid #ff69b4;
-            border-radius: 10px; margin-top: 10px; font-size: 0.8rem;
-        }
-
-        .btn-remove { background: rgba(255, 255, 255, 0.1); color: #ff69b4; border-radius: 8px; font-family: Arial; font-weight: bold; }
+        .btn-add { width: 100%; padding: 12px; background: #ff69b4; color: white; font-size: 1.3rem; border-radius: 12px; }
+        .btn-pdf { width: 100%; padding: 10px; background: linear-gradient(90deg, #ff69b4, #0077be); color: white; font-size: 1.1rem; border-radius: 12px; margin-top: 10px;}
+        .btn-clear { width: 100%; padding: 8px; background: transparent; color: #ff69b4; border: 1px solid #ff69b4; border-radius: 10px; margin-top: 10px; font-size: 0.8rem;}
+        .btn-remove { background: rgba(255, 255, 255, 0.1); color: #ff69b4; border-radius: 8px; font-family: Arial; }
 
         .result-section { margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px; }
-        #gwa-display { font-size: 3rem; color: #fff; text-shadow: 0 0 20px #00ffff; font-weight: 900; }
+        #gwa-display { font-size: 3.5rem; color: #fff; text-shadow: 0 0 20px #00ffff; font-weight: 900; }
     </style>
 </head>
 <body>
 
-    <video id="bg-portrait" class="video-bg" autoplay muted loop playsinline>
+    <video id="bg-portrait" class="video-bg" autoplay muted loop playsinline preload="auto">
         <source src="oceanp.mp4" type="video/mp4">
     </video>
-    <video id="bg-landscape" class="video-bg" autoplay muted loop playsinline>
+    <video id="bg-landscape" class="video-bg" autoplay muted loop playsinline preload="auto">
         <source src="oceanl.mp4" type="video/mp4">
     </video>
 
@@ -141,71 +131,48 @@
         function addRow() {
             const row = document.createElement('div');
             row.className = 'row';
-            row.innerHTML = `
-                <input type="number" step="0.01" class="grade-input" placeholder="1.0" oninput="calculateGWA()">
-                <input type="number" step="0.5" class="unit-input" placeholder="3" oninput="calculateGWA()">
-                <button class="btn-remove" onclick="removeRow(this)">✕</button>
-            `;
+            row.innerHTML = `<input type="number" step="0.01" class="grade-input" placeholder="1.0" oninput="calculateGWA()"><input type="number" step="0.5" class="unit-input" placeholder="3" oninput="calculateGWA()"><button class="btn-remove" onclick="removeRow(this)">✕</button>`;
             container.appendChild(row);
         }
 
-        function removeRow(btn) {
-            btn.parentElement.remove();
-            calculateGWA();
-        }
+        function removeRow(btn) { btn.parentElement.remove(); calculateGWA(); }
 
         function calculateGWA() {
             const grades = document.querySelectorAll('.grade-input');
             const units = document.querySelectorAll('.unit-input');
-            let totalWeightedPoints = 0;
-            let totalUnits = 0;
-
-            grades.forEach((gradeInput, index) => {
-                const g = parseFloat(gradeInput.value);
-                const u = parseFloat(units[index].value);
-                if (!isNaN(g) && !isNaN(u)) {
-                    totalWeightedPoints += (g * u);
-                    totalUnits += u;
-                }
+            let pts = 0, uTotal = 0;
+            grades.forEach((gIn, i) => {
+                const g = parseFloat(gIn.value), u = parseFloat(units[i].value);
+                if (!isNaN(g) && !isNaN(u)) { pts += (g * u); uTotal += u; }
             });
-
-            if (totalUnits > 0) {
-                display.innerText = (totalWeightedPoints / totalUnits).toFixed(2);
-            } else {
-                display.innerText = "0.00";
-            }
+            display.innerText = uTotal > 0 ? (pts / uTotal).toFixed(2) : "0.00";
         }
 
-        function clearAll() {
-            container.innerHTML = '';
-            display.innerText = "0.00";
-            addRow(); 
-        }
+        function clearAll() { container.innerHTML = ''; display.innerText = "0.00"; addRow(); }
 
         function downloadPDF() {
             const element = document.getElementById('export-area');
             const opt = {
-                margin: 0.2,
-                filename: 'My_GWA.pdf',
-                image: { type: 'jpeg', quality: 1 },
+                margin: 0.2, filename: 'My_GWA.pdf', image: { type: 'jpeg', quality: 1 },
                 html2canvas: { scale: 3, useCORS: true, backgroundColor: '#001f3f' },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
-
-            const buttons = element.querySelectorAll('button');
-            buttons.forEach(b => b.style.display = 'none');
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                buttons.forEach(b => b.style.display = 'block');
-            });
+            const btns = element.querySelectorAll('button');
+            btns.forEach(b => b.style.display = 'none');
+            html2pdf().set(opt).from(element).save().then(() => { btns.forEach(b => b.style.display = 'inline-block'); });
         }
 
-        // Fix video for iOS/Safari
-        window.addEventListener('touchstart', () => {
-            document.querySelectorAll('video').forEach(v => v.play());
-        }, {once: true});
-
-        window.onload = addRow;
+        // Force Video Start for Mobile
+        document.addEventListener('DOMContentLoaded', () => {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(v => {
+                v.play().catch(() => {
+                    // If autoplay fails, wait for a touch to start it
+                    window.addEventListener('touchstart', () => v.play(), {once: true});
+                });
+            });
+            addRow();
+        });
     </script>
 </body>
 </html>
