@@ -19,14 +19,14 @@
             margin: 0 auto;
             overflow: hidden;
             width: 100%;
-            max-width: 448px; /* Tailwind max-w-md */
+            max-width: 448px;
         }
 
         .video-bg {
             position: fixed; top: 50%; left: 50%;
             min-width: 100%; min-height: 100%;
             z-index: -100; transform: translateX(-50%) translateY(-50%);
-            object-fit: cover; filter: brightness(0.6);
+            object-fit: cover; filter: brightness(0.5);
         }
 
         #mobile-video { display: block; }
@@ -39,13 +39,10 @@
         .comet-glow { text-shadow: 0 0 15px rgba(0, 212, 255, 0.6), 0 0 30px rgba(255, 77, 109, 0.3); }
 
         input {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(0, 212, 255, 0.2) !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: white; text-align: center;
         }
-        
-        /* Ensures the PDF capture doesn't see scrollbars */
-        #export-area { overflow: visible !important; }
     </style>
 </head>
 <body class="min-h-screen text-white overflow-x-hidden">
@@ -57,12 +54,12 @@
         <source src="mitsuhal.mp4" type="video/mp4">
     </video>
 
-    <div class="fixed inset-0 bg-gradient-to-b from-indigo-950/60 via-slate-900/80 to-orange-900/30 -z-[90]"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-indigo-950/40 via-slate-900/70 to-orange-900/20 -z-[90]"></div>
 
     <div class="relative z-10 min-h-screen flex items-center justify-center py-12 px-6">
         <div class="w-full max-w-md">
             
-            <div class="text-center mb-8">
+            <div class="text-center mb-8" id="header-section">
                 <div class="relative inline-block">
                     <h1 class="text-5xl font-black italic tracking-tighter comet-glow" style="font-family: 'Zen Old Mincho', serif;">君の名は。</h1>
                     <div class="absolute -top-4 -right-8 bg-pink-500 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border-2 border-black shadow-lg">Itomori</div>
@@ -70,28 +67,30 @@
                 <p class="text-cyan-400 font-mono tracking-[0.4em] uppercase text-[10px] mt-4">Itomori Academic Registry</p>
             </div>
 
-            <div id="export-area" class="glass-card p-8 rounded-[2.5rem] shadow-2xl relative transition-all duration-300">
-                
-                <div id="label-header" class="grid grid-cols-[1fr_1fr_40px] gap-4 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400/80">
+            <div id="export-area" class="glass-card p-8 rounded-[2.5rem] shadow-2xl relative flex flex-col">
+                <div id="pdf-header" class="hidden text-center mb-6">
+                    <h2 class="text-3xl font-bold italic" style="color: #fff; font-family: 'Zen Old Mincho', serif;">OFFICIAL GWA REPORT</h2>
+                    <div class="h-px bg-cyan-500/50 w-full my-4"></div>
+                </div>
+
+                <div class="grid grid-cols-[1fr_1fr_40px] gap-4 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400/80">
                     <span>Grade</span><span>Units</span><span></span>
                 </div>
 
                 <div id="grades-container" class="space-y-3 mb-6"></div>
 
+                <div id="pdf-spacer" class="hidden flex-grow"></div>
+
                 <div class="space-y-4" id="ui-buttons">
-                    <button onclick="addRow()" class="w-full py-3 bg-white/90 text-indigo-950 font-black uppercase tracking-tighter italic rounded-xl hover:scale-[1.02] active:scale-95 transition-all">+ Add Course</button>
+                    <button onclick="addRow()" class="w-full py-3 bg-white/90 text-indigo-950 font-black uppercase tracking-tighter italic rounded-xl transition-all hover:bg-white">+ Add Course</button>
                     <button onclick="downloadPDF()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-pink-500 text-white font-bold uppercase text-xs tracking-widest rounded-xl shadow-lg">Archive GWA</button>
                     <button onclick="clearAll()" class="w-full py-2 text-slate-500 hover:text-orange-400 text-[10px] font-bold uppercase tracking-[0.2em]">Reset Musubi</button>
                 </div>
 
-                <div class="mt-8 pt-6 border-t border-white/10 text-center">
+                <div id="result-section" class="mt-8 pt-6 border-t border-white/10 text-center">
                     <p class="text-[10px] font-mono text-pink-400 uppercase tracking-widest mb-1">Final Result</p>
                     <div id="gwa-display" class="text-6xl font-black italic comet-glow" style="font-family: 'Zen Old Mincho', serif;">0.00</div>
                 </div>
-            </div>
-
-            <div class="mt-8 text-center" id="footer-text">
-                <p class="text-slate-500 text-[9px] uppercase tracking-[0.6em]">Syncing with Katawaredoki...</p>
             </div>
         </div>
     </div>
@@ -128,55 +127,44 @@
         async function downloadPDF() {
             const element = document.getElementById('export-area');
             const ui = document.getElementById('ui-buttons');
+            const pdfHeader = document.getElementById('pdf-header');
+            const spacer = document.getElementById('pdf-spacer');
             const deleteBtns = document.querySelectorAll('.delete-btn');
-            const rowCount = document.querySelectorAll('.grade-row').length;
 
-            // 1. Setup PDF State
+            // 1. Force Full Page Height for PDF
             ui.style.display = 'none';
+            pdfHeader.classList.remove('hidden');
+            spacer.classList.remove('hidden');
             deleteBtns.forEach(b => b.style.visibility = 'hidden');
             
-            // Dynamic styling for the export
-            const originalStyle = element.getAttribute('style');
+            // Set styles to fill the whole PDF page
             element.style.backgroundImage = "url('mitsuha.jpg')";
             element.style.backgroundSize = "cover";
             element.style.backgroundPosition = "center";
             element.style.borderRadius = "0px";
+            element.style.minHeight = "1056px"; // Standard A4 height at 96 DPI
             element.style.width = "100%";
-            element.style.maxWidth = "none"; // Let it expand for the PDF
-            
-            // Auto-Landscape if more than 12 rows
-            const isLandscape = rowCount > 12;
+            element.style.maxWidth = "800px"; 
 
             const opt = {
-                margin: 0.3,
-                filename: 'Itomori_Academic_Registry.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true, 
-                    letterRendering: true,
-                    width: element.clientWidth,
-                    height: element.scrollHeight
-                },
-                jsPDF: { 
-                    unit: 'in', 
-                    format: 'a4', 
-                    orientation: isLandscape ? 'landscape' : 'portrait' 
-                }
+                margin: 0, // No margin so the image goes edge-to-edge
+                filename: 'Itomori_Registry_GWA.pdf',
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
 
-            try {
-                await html2pdf().set(opt).from(element).save();
-            } catch (err) {
-                console.error("PDF Export failed", err);
-            } finally {
-                // 3. Restore UI
-                ui.style.display = 'block';
-                deleteBtns.forEach(b => b.style.visibility = 'visible');
-                element.style.backgroundImage = "none";
-                element.style.borderRadius = "2.5rem";
-                element.style.maxWidth = "448px";
-            }
+            await html2pdf().set(opt).from(element).save();
+
+            // 2. Restore Web Mode
+            ui.style.display = 'block';
+            pdfHeader.classList.add('hidden');
+            spacer.classList.add('hidden');
+            deleteBtns.forEach(b => b.style.visibility = 'visible');
+            element.style.backgroundImage = "none";
+            element.style.minHeight = ""; 
+            element.style.borderRadius = "2.5rem";
+            element.style.maxWidth = "448px";
         }
 
         window.onload = () => { addRow(); };
