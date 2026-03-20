@@ -3,59 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mitsuha | GWA Calculator</title>
+    <title>Itomori Registry | GWA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Zen+Old+Mincho:wght@700&display=swap');
         
-        body { 
-            font-family: 'Space Grotesk', sans-serif; 
-            background-color: #0c0c1d; 
-        }
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #0c0c1d; }
 
         .glass-card {
             background: rgba(15, 15, 35, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(0, 212, 255, 0.2);
+            margin-left: auto; margin-right: auto;
         }
 
-        /* Video Background Logic from your working file */
         .video-bg {
-            position: fixed;
-            top: 50%; left: 50%;
+            position: fixed; top: 50%; left: 50%;
             min-width: 100%; min-height: 100%;
-            width: auto; height: auto;
-            z-index: -100;
-            transform: translateX(-50%) translateY(-50%);
-            object-fit: cover;
-            filter: brightness(0.6);
+            z-index: -100; transform: translateX(-50%) translateY(-50%);
+            object-fit: cover; filter: brightness(0.6);
         }
 
-        /* Toggle Logic */
         #mobile-video { display: block; }
         #desktop-video { display: none; }
-
         @media (min-width: 768px) {
             #mobile-video { display: none; }
             #desktop-video { display: block; }
         }
 
-        .comet-glow {
-            text-shadow: 0 0 15px rgba(0, 212, 255, 0.6), 0 0 30px rgba(255, 77, 109, 0.3);
-        }
+        .comet-glow { text-shadow: 0 0 15px rgba(0, 212, 255, 0.6), 0 0 30px rgba(255, 77, 109, 0.3); }
 
         input {
             background: rgba(255, 255, 255, 0.05) !important;
             border: 1px solid rgba(0, 212, 255, 0.2) !important;
-            color: white;
-            text-align: center;
-        }
-
-        input:focus {
-            border-color: rgba(0, 212, 255, 0.8) !important;
-            outline: none;
+            color: white; text-align: center;
         }
     </style>
 </head>
@@ -64,7 +47,6 @@
     <video autoplay muted loop playsinline id="mobile-video" class="video-bg">
         <source src="mitsuhap.mp4" type="video/mp4">
     </video>
-
     <video autoplay muted loop playsinline id="desktop-video" class="video-bg">
         <source src="mitsuhal.mp4" type="video/mp4">
     </video>
@@ -72,49 +54,38 @@
     <div class="fixed inset-0 bg-gradient-to-b from-indigo-950/60 via-slate-900/80 to-orange-900/30 -z-[90]"></div>
 
     <div class="relative z-10 min-h-screen flex items-center justify-center py-12 px-6">
-        
         <div class="max-w-md w-full">
+            
             <div class="text-center mb-8">
-                <div class="relative inline-block mb-4">
+                <div class="relative inline-block">
                     <h1 class="text-5xl font-black italic tracking-tighter comet-glow" style="font-family: 'Zen Old Mincho', serif;">君の名は。</h1>
-                    <div class="absolute -top-4 -right-8 bg-cyan-500 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border-2 border-black shadow-lg">Magic Hour</div>
+                    <div class="absolute -top-4 -right-8 bg-pink-500 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border-2 border-black shadow-lg">Itomori</div>
                 </div>
-                <p class="text-cyan-400 font-mono tracking-[0.4em] uppercase text-[10px] mt-2">GWA Command Center</p>
+                <p class="text-cyan-400 font-mono tracking-[0.4em] uppercase text-[10px] mt-4">Itomori Academic Registry</p>
             </div>
 
-            <div id="export-area" class="glass-card p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+            <div id="export-area" class="glass-card p-8 rounded-[2.5rem] shadow-2xl relative transition-all duration-300">
                 
-                <div class="grid grid-cols-[1fr_1fr_40px] gap-4 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400/80">
-                    <span>Grade</span>
-                    <span>Units</span>
-                    <span></span>
+                <div id="label-header" class="grid grid-cols-[1fr_1fr_40px] gap-4 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400/80">
+                    <span>Grade</span><span>Units</span><span></span>
                 </div>
 
-                <div id="grades-container" class="space-y-3 mb-6">
-                    </div>
+                <div id="grades-container" class="space-y-3 mb-6"></div>
 
-                <div class="space-y-3">
-                    <button onclick="addRow()" class="w-full py-3 bg-white/90 hover:bg-white text-indigo-950 font-black uppercase tracking-tighter italic rounded-xl transition-all transform hover:scale-[1.02] active:scale-95">
-                        + Add Subject
-                    </button>
-                    
-                    <button onclick="downloadPDF()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-400 hover:to-pink-400 text-white font-bold uppercase text-xs tracking-widest rounded-xl transition-all shadow-lg">
-                        Export Report
-                    </button>
-
-                    <button onclick="clearAll()" class="w-full py-2 text-slate-500 hover:text-cyan-400 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
-                        Reset System
-                    </button>
+                <div class="space-y-4" id="ui-buttons">
+                    <button onclick="addRow()" class="w-full py-3 bg-white/90 text-indigo-950 font-black uppercase tracking-tighter italic rounded-xl hover:scale-[1.02] active:scale-95 transition-all">+ Add Course</button>
+                    <button onclick="downloadPDF()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-pink-500 text-white font-bold uppercase text-xs tracking-widest rounded-xl shadow-lg">DOWNLOAD</button>
+                    <button onclick="clearAll()" class="w-full py-2 text-slate-500 hover:text-orange-400 text-[10px] font-bold uppercase tracking-[0.2em]">Reset</button>
                 </div>
 
                 <div class="mt-8 pt-6 border-t border-white/10 text-center">
-                    <p class="text-[10px] font-mono text-pink-400 uppercase tracking-widest mb-1">Calculated GWA</p>
+                    <p class="text-[10px] font-mono text-pink-400 uppercase tracking-widest mb-1">Final Result</p>
                     <div id="gwa-display" class="text-6xl font-black italic comet-glow" style="font-family: 'Zen Old Mincho', serif;">0.00</div>
                 </div>
             </div>
 
             <div class="mt-8 text-center">
-                <p class="text-slate-500 text-[9px] uppercase tracking-[0.5em]">Syncing with Itomori Terminal...</p>
+                <p class="text-slate-500 text-[9px] uppercase tracking-[0.6em]">Syncing with Katawaredoki...</p>
             </div>
         </div>
     </div>
@@ -125,11 +96,11 @@
 
         function addRow() {
             const row = document.createElement('div');
-            row.className = 'grid grid-cols-[1fr_1fr_40px] gap-4 items-center';
+            row.className = 'grid grid-cols-[1fr_1fr_40px] gap-4 items-center mb-3 grade-row';
             row.innerHTML = `
                 <input type="number" step="0.01" class="grade-input w-full p-3 rounded-xl font-bold" placeholder="1.00" oninput="calculateGWA()">
                 <input type="number" step="0.5" class="unit-input w-full p-3 rounded-xl font-bold" placeholder="3.0" oninput="calculateGWA()">
-                <button onclick="removeRow(this)" class="text-pink-500 hover:text-pink-400 font-bold text-xl">✕</button>
+                <button onclick="removeRow(this)" class="text-pink-500 text-xl delete-btn btn-to-hide">✕</button>
             `;
             container.appendChild(row);
         }
@@ -150,27 +121,33 @@
 
         function downloadPDF() {
             const element = document.getElementById('export-area');
-            const btns = document.querySelectorAll('button');
-            btns.forEach(b => b.style.opacity = '0');
+            const mainBtns = document.getElementById('ui-buttons');
+            const deleteBtns = document.querySelectorAll('.delete-btn');
+            
+            mainBtns.style.display = 'none';
+            deleteBtns.forEach(b => b.style.visibility = 'hidden');
+            element.style.backgroundImage = "url('mitsuha.jpg')";
+            element.style.backgroundSize = "cover";
+            element.style.backgroundPosition = "center";
+            element.style.borderRadius = "0px";
 
-            html2pdf().set({
+            const opt = {
                 margin: 0.5,
-                filename: 'Mitsuha_GWA_Report.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 3, useCORS: true, backgroundColor: '#0c0c1d' },
+                filename: 'Itomori_Registry_GWA.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            }).from(element).save().then(() => {
-                btns.forEach(b => b.style.opacity = '1');
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                mainBtns.style.display = 'block';
+                deleteBtns.forEach(b => b.style.visibility = 'visible');
+                element.style.backgroundImage = "none";
+                element.style.borderRadius = "2.5rem";
             });
         }
 
-        // Initialize
-        window.onload = () => {
-            addRow();
-            // Fallback play trigger
-            const playVids = () => document.querySelectorAll('video').forEach(v => v.play());
-            document.addEventListener('touchstart', playVids, {once: true});
-        };
+        window.onload = () => { addRow(); };
     </script>
 </body>
 </html>
