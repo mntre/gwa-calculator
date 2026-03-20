@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✦ Ocean GWA Calculator ✦</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: hidden;
+            color: #fff;
+            background-color: #001f3f; /* Deep Ocean Fallback */
+        }
+
+        /* 1. Ocean Video Background Logic */
+        .video-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -100;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            display: none;
+            filter: brightness(0.8) saturate(1.2);
+        }
+        @media (orientation: portrait) { #bg-portrait { display: block; } }
+        @media (orientation: landscape) { #bg-landscape { display: block; } }
+
+        /* 2. Ocean & Pink UI Styling */
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            /* Blue to Pink gradient overlay */
+            background: linear-gradient(135deg, rgba(0, 119, 190, 0.2) 0%, rgba(255, 105, 180, 0.1) 100%);
+        }
+
+        .calc-card {
+            background: rgba(0, 31, 63, 0.7); /* Deep blue transparent */
+            backdrop-filter: blur(12px);
+            border: 2px solid #ff69b4; /* Pink border */
+            padding: 2.5rem;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), 0 0 10px rgba(255, 105, 180, 0.3);
+            position: relative;
+            text-align: center;
+        }
+
+        h1 { 
+            font-family: 'Pirata One', system-ui;
+            margin: 0 0 5px 0;
+            color: #ff69b4; /* Pink Title */
+            font-size: 3rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
+        }
+
+        #rank-display {
+            font-family: 'Pirata One', cursive;
+            color: #00ffff; /* Cyan Rank */
+            font-size: 1.4rem;
+            letter-spacing: 1.5px;
+            margin-bottom: 25px;
+            display: block;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 45px;
+            gap: 12px;
+            margin-bottom: 15px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .label-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 45px;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #00ffff;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            text-align: center;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            font-family: 'Pirata One', cursive;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 15px;
+            background: #ff69b4;
+            color: white;
+            font-size: 1.6rem;
+            margin-top: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+        }
+        .btn-add:hover { 
+            background: #ff85c2; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.6);
+        }
+
+        .btn-clear {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: #ff69b4;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            border: 2px solid #ff69b4;
+            border-radius: 15px;
+        }
+        .btn-clear:hover { background: rgba(255, 105, 180, 0.1); }
+
+        .btn-remove {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ff69b4;
+            border-radius: 10px;
+            font-size: 1.2rem;
+        }
+        .btn-remove:hover { background: #ff69b4; color: #fff; }
+
+        .result-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #gwa-display {
+            font-size: 4.5rem;
+            display: block;
+            color: #fff;
+            text-shadow: 0 0 20px #00ffff, 0 0 40px rgba(0, 255, 255, 0.3);
+            font-weight: 900;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <video id="bg-portrait" class="video-bg" autoplay muted loop playsinline src="oceanp.mp4"></video>
+    <video id="bg-landscape" class="video-bg" autoplay muted loop playsinline src="oceanl.mp4"></video>
+
+    <div class="container">
+        <div class="calc-card">
+            <h1>✦ GWA CALCULATOR ✦</h1>
+            
+            <div class="label-grid">
+                <span>Grade</span>
+                <span>Units</span>
+                <span></span>
+            </div>
+
+            <div id="grades-container">
+                </div>
+
+            <button class="btn-add" onclick="addRow()">+ Add Subject</button>
+            <button class="btn-clear" onclick="clearAll()">Clear All</button>
+
+            <div class="result-section">
+                <span id="gwa-display">0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('grades-container');
+        const display = document.getElementById('gwa-display');
+        const rankText = document.getElementById('rank-display');
+
+        function addRow() {
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.innerHTML = `
+                <input type="number" step="0.01" class="grade-input" placeholder="1.0" oninput="calculateGWA()">
+                <input type="number" step="0.5" class="unit-input" placeholder="3" oninput="calculateGWA()">
+                <button class="btn-remove" onclick="removeRow(this)">✕</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function removeRow(btn) {
+            btn.parentElement.remove();
+            calculateGWA();
+        }
+
+        function calculateGWA() {
+            const grades = document.querySelectorAll('.grade-input');
+            const units = document.querySelectorAll('.unit-input');
+            let totalWeightedPoints = 0;
+            let totalUnits = 0;
+
+            grades.forEach((gradeInput, index) => {
+                const g = parseFloat(gradeInput.value);
+                const u = parseFloat(units[index].value);
+                if (!isNaN(g) && !isNaN(u)) {
+                    totalWeightedPoints += (g * u);
+                    totalUnits += u;
+                }
+            });
+
+            if (totalUnits > 0) {
+                const finalGwa = (totalWeightedPoints / totalUnits).toFixed(2);
+                display.innerText = finalGwa;
+                updateRank(parseFloat(finalGwa));
+            } else {
+                display.innerText = "0.00";
+                rankText.innerText = "RANK: NEW STUDENT";
+            }
+        }
+
+        function updateRank(val) {
+            // Updated rank titles to fit the ocean/academy theme
+            if (val <= 1.25) rankText.innerText = "RANK: OCEAN COUNCIL";
+            else if (val <= 1.75) rankText.innerText = "RANK: ELITE DIVER";
+            else if (val <= 2.25) rankText.innerText = "RANK: DEEP SURFER";
+            else if (val <= 3.00) rankText.innerText = "RANK: STUDENT";
+            else rankText.innerText = "RANK: NEWCOMER";
+        }
+
+        function clearAll() {
+            container.innerHTML = '';
+            display.innerText = "0.00";
+            rankText.innerText = "RANK: NEW STUDENT";
+            addRow(); 
+        }
+
+        window.onload = addRow;
+    </script>
+</body>
+</html>
