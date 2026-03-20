@@ -3,39 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✦ Ocean GWA ✦</title>
-    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <title>✦ Magic Hour GWA ✦</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Old+Mincho:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
-        /* Force the body to be transparent so video shows through */
+        :root {
+            --comet-glow: #00d4ff;
+            --sunset-pink: #ff4d6d;
+            --night-blue: #1a1a2e;
+        }
+
         html, body {
             margin: 0; padding: 0; 
             width: 100%; height: 100%;
-            background-color: #001f3f; /* Deep blue fallback */
-            font-family: 'JetBrains Mono', monospace;
+            /* FALLBACK GRADIENT: If video fails, this sky appears */
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 40%, #4b3d60 70%, #ff7e5f 100%);
+            font-family: 'Kosugi Maru', sans-serif;
             overflow-x: hidden;
         }
 
-        /* Video styling with highest priority depth */
         .video-bg {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             object-fit: cover;
-            z-index: -10; /* Far back */
-            filter: brightness(0.4) saturate(1.2);
+            z-index: -10;
+            filter: brightness(0.6) contrast(1.1);
             pointer-events: none;
             display: none; 
         }
 
-        /* Orientation Logic */
+        /* Responsive Video Toggle */
         @media (orientation: portrait) { #bg-portrait { display: block !important; } }
         @media (orientation: landscape) { #bg-landscape { display: block !important; } }
 
         .container {
-            position: relative;
-            z-index: 1; /* Sits above video */
             display: flex; align-items: center; justify-content: center;
             min-height: 100vh; width: 100%; padding: 15px;
             box-sizing: border-box;
@@ -43,64 +46,97 @@
         }
 
         .calc-card {
-            background: rgba(0, 31, 63, 0.82); /* Semi-transparent blue */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid #ff69b4;
-            padding: 1.5rem; border-radius: 20px;
-            width: 100%; max-width: 350px;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            background: rgba(26, 26, 46, 0.75); /* Darker frost for readability */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem; border-radius: 15px;
+            width: 100%; max-width: 360px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
             text-align: center; color: white;
         }
 
         h1 { 
-            font-family: 'Pirata One', system-ui; margin: 0 0 15px 0;
-            color: #ff69b4; font-size: clamp(1.4rem, 7vw, 2.2rem); 
-            text-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
+            font-family: 'Zen Old Mincho', serif; margin: 0;
+            color: #fff; font-size: clamp(1.8rem, 8vw, 2.4rem); 
+            text-shadow: 0 0 10px var(--comet-glow);
+            letter-spacing: 2px;
+        }
+
+        p.subtitle {
+            font-size: 0.65rem; margin-bottom: 25px; opacity: 0.8;
+            letter-spacing: 4px; text-transform: uppercase; color: var(--comet-glow);
         }
 
         .label-grid, .row {
             display: grid; grid-template-columns: 1.2fr 1fr 40px;
-            gap: 8px; margin-bottom: 8px;
+            gap: 10px; margin-bottom: 12px;
         }
 
-        .label-grid { color: #00ffff; font-size: 0.7rem; text-transform: uppercase; }
+        .label-grid { font-size: 0.65rem; font-weight: bold; opacity: 0.7; }
 
         input {
-            width: 100%; padding: 10px; border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.5); color: #fff;
-            border-radius: 10px; text-align: center; font-size: 0.9rem;
+            width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05); color: #fff;
+            border-radius: 4px; text-align: center; font-size: 1rem;
+            transition: 0.3s;
         }
 
-        button { cursor: pointer; border: none; font-family: 'Pirata One', cursive; transition: 0.2s; }
+        input:focus { border-color: var(--comet-glow); outline: none; background: rgba(255, 255, 255, 0.1); }
 
-        .btn-add { width: 100%; padding: 12px; background: #ff69b4; color: white; font-size: 1.3rem; border-radius: 12px; }
-        .btn-pdf { width: 100%; padding: 10px; background: linear-gradient(90deg, #ff69b4, #0077be); color: white; font-size: 1.1rem; border-radius: 12px; margin-top: 10px; }
-        .btn-clear { width: 100%; padding: 6px; background: transparent; color: #ff69b4; border: 1px solid #ff69b4; border-radius: 10px; margin-top: 10px; font-size: 0.8rem; }
-        .btn-remove { background: rgba(255, 255, 255, 0.1); color: #ff69b4; border-radius: 8px; font-family: Arial; font-weight: bold; }
+        button { cursor: pointer; border: none; font-family: 'Kosugi Maru', sans-serif; transition: 0.3s; }
 
-        .result-section { margin-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px; }
-        #gwa-display { font-size: 3.5rem; color: #fff; text-shadow: 0 0 20px #00ffff; font-weight: 900; }
+        .btn-add { 
+            width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.9); 
+            color: #1a1a2e; font-weight: bold; border-radius: 4px; 
+        }
+
+        .btn-pdf { 
+            width: 100%; padding: 10px; 
+            background: linear-gradient(45deg, var(--comet-glow), var(--sunset-pink));
+            color: white; font-weight: bold; border-radius: 4px; margin-top: 15px;
+        }
+
+        .btn-clear { 
+            width: 100%; padding: 8px; background: transparent; 
+            color: white; opacity: 0.5; margin-top: 10px; font-size: 0.7rem;
+        }
+
+        .btn-remove { background: transparent; color: var(--sunset-pink); font-size: 1.2rem; }
+
+        .result-section { margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 20px; }
+        
+        #gwa-display { 
+            font-size: 4rem; color: #fff; 
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); 
+            font-family: 'Zen Old Mincho', serif;
+        }
     </style>
 </head>
 <body>
 
     <video id="bg-portrait" class="video-bg" autoplay muted loop playsinline preload="auto">
-        <source src="oceanp.mp4" type="video/mp4">
+        <source src="mitsuhap.mp4" type="video/mp4">
     </video>
     <video id="bg-landscape" class="video-bg" autoplay muted loop playsinline preload="auto">
-        <source src="oceanl.mp4" type="video/mp4">
+        <source src="mitsuhal.mp4" type="video/mp4">
     </video>
 
     <div class="container">
         <div class="calc-card" id="export-area">
-            <h1>✦ GWA CALCULATOR ✦</h1>
+            <h1>君の名は。</h1>
+            <p class="subtitle">GWA Calculator</p>
+
             <div class="label-grid"><span>Grade</span><span>Units</span><span></span></div>
             <div id="grades-container"></div>
-            <button class="btn-add" onclick="addRow()">+ Add Subject</button>
-            <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
-            <button class="btn-clear" onclick="clearAll()">Clear All</button>
-            <div class="result-section"><span id="gwa-display">0.00</span></div>
+
+            <button class="btn-add" onclick="addRow()">+ Add Course</button>
+            <button class="btn-pdf" onclick="downloadPDF()">Export PDF</button>
+            <button class="btn-clear" onclick="clearAll()">Reset All</button>
+
+            <div class="result-section">
+                <span id="gwa-display">0.00</span>
+            </div>
         </div>
     </div>
 
@@ -111,7 +147,11 @@
         function addRow() {
             const row = document.createElement('div');
             row.className = 'row';
-            row.innerHTML = `<input type="number" step="0.01" class="grade-input" placeholder="1.0" oninput="calculateGWA()"><input type="number" step="0.5" class="unit-input" placeholder="3" oninput="calculateGWA()"><button class="btn-remove" onclick="removeRow(this)">✕</button>`;
+            row.innerHTML = `
+                <input type="number" step="0.01" class="grade-input" placeholder="0.00" oninput="calculateGWA()">
+                <input type="number" step="0.5" class="unit-input" placeholder="0" oninput="calculateGWA()">
+                <button class="btn-remove" onclick="removeRow(this)">✕</button>
+            `;
             container.appendChild(row);
         }
 
@@ -135,22 +175,22 @@
             btns.forEach(b => b.style.display = 'none');
 
             html2pdf().set({
-                margin: 0.2, filename: 'GWA_Report.pdf', image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 3, useCORS: true, backgroundColor: '#001f3f' },
+                margin: 0.2, filename: 'Mitsuha_GWA.pdf', image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 3, useCORS: true, backgroundColor: '#1a1a2e' },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             }).from(element).save().then(() => {
                 btns.forEach(b => b.style.display = 'inline-block');
             });
         }
 
-        // Critical: Kickstart videos for mobile
+        // Handle autoplay restrictions
         window.onload = () => {
             addRow();
-            const startVids = () => {
+            const playVids = () => {
                 document.querySelectorAll('video').forEach(v => v.play());
-                document.removeEventListener('touchstart', startVids);
             };
-            document.addEventListener('touchstart', startVids);
+            document.addEventListener('touchstart', playVids, {once: true});
+            document.addEventListener('click', playVids, {once: true});
         };
     </script>
 </body>
